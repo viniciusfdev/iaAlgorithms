@@ -37,25 +37,25 @@ class Graph:
         minor = list(self.border)[0]
 
         for node in self.border:
-            if self.border[node]+self.nodes[node]['h'] < self.border[minor]+self.nodes[minor]['h']:
+            if self.border[node]['dist']+self.nodes[node]['h'] < self.border[minor]['dist']+self.nodes[minor]['h']:
                 minor = node
 
-        print('Menor da borda: '+minor)
-        
         return minor
     
     def incrementBorder(self, node_key):
 
-        parenthDist = self.border[node_key]
+        parents = self.border[node_key]['parents']
+        parents.append(node_key)
+
+        parenthDist = self.border[node_key]['dist']
+        
         del self.border[node_key]
         self.visited.append(node_key)
         
         for node in self.nodes[node_key]['conn']:
             if(node not in self.visited):
-                self.border[node] = self.nodes[node_key]['conn'][node]+parenthDist
+                self.border[node] = { 'dist': self.nodes[node_key]['conn'][node]+parenthDist,  'parents': parents }
 
-        print(self.border)
-        
         if self.border == {}:
             return True
         else:
@@ -65,6 +65,7 @@ class Graph:
     def getDeph(self):  
         if self.whoIsMinor() == self.destiny:
             self.found = True
+            self.nodePath = self.border[self.destiny]
             return True
 
         elif self.incrementBorder(self.whoIsMinor()):
@@ -72,13 +73,21 @@ class Graph:
 
         return self.getDeph()
 
+    def getResult(self):
+        if self.border[self.destiny]['parents'] == []:
+            print('You dont search or dont have any result')
+        else:    
+            for node in self.border[self.destiny]['parents']:
+                print(node)
+            print(self.destiny)
 
     def search(self):
         print('Searching...')
-        self.border[self.origin] = 0;
+        self.border[self.origin] = { 'dist': 0,  'parents': []}
         
         if self.getDeph() | self.found:
-            print('encontrei o caminho')
+            self.getResult()
+            print('\nEncontrei o caminho hehe')
         else:
             print('caminho nao encontrado')
 
