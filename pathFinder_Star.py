@@ -6,6 +6,7 @@ class Graph:
         self.destiny = destiny
         self.border = {}
         self.found = False
+        self.visited = []
  
     def start(self):
         print('Starting...')
@@ -27,59 +28,70 @@ class Graph:
             'Vaslui': {'h': 199, 'conn': {'Iasi': 92, 'Urziceni': 142}},
             'Urziceni': {'h': 80, 'conn': {'Vaslui': 142, 'Bucharest': 85, 'Hirsova': 98}},
             'Eforie': {'h': 161, 'conn': {'Hirsova': 86}},
+            'Iasi': {'h': 226, 'conn': {'Neamt': 87, 'Vaslui': 92}},
+            'Hirsova': {'h': 151, 'conn': {'Eforie': 86, 'Urziceni': 98}},
             'Bucharest': {'h': 0, 'conn': {'Fagaras': 211, 'Pitesti': 101, 'Giurgiu': 90, 'Urziceni': 86}}
         }
 
     def whoIsMinor(self):
         minor = list(self.border)[0]
-        for node in self.border:
-            if node['dist'] < minor:
-                minor = node
-        return minor
 
-    def getDistance(self, node_key, parenthDist):
-        return self.nodes[node_key]['h']+parenthDist
+        for node in self.border:
+            if self.border[node]['dist']+self.nodes[node]['h'] < self.border[minor]['dist']+self.nodes[minor]['h']:
+                minor = node
+
+        return minor
     
     def incrementBorder(self, node_key):
+
+        parents = self.border[node_key]['parents']
+        parents.append(node_key)
+
         parenthDist = self.border[node_key]['dist']
+        
         del self.border[node_key]
+        self.visited.append(node_key)
         
         for node in self.nodes[node_key]['conn']:
-            if self.border[node]:
-                return
-            else:
-                self.border[node] = {
-                    node: self.nodes[node_key]['h']+parenthDist
-                }
+            if(node not in self.visited):
+                self.border[node] = { 'dist': self.nodes[node_key]['conn'][node]+parenthDist,  'parents': parents }
 
-        print(self.border)
-        
         if self.border == {}:
-            return False
-        else:
             return True
+        else:
+            return False
 
 
-    def getDeph(self):
+    def getDeph(self):  
         if self.whoIsMinor() == self.destiny:
             self.found = True
-            return
+            self.nodePath = self.border[self.destiny]
+            return True
 
-        if self.incrementBorder(self.whoIsMinor()):
+        elif self.incrementBorder(self.whoIsMinor()):
             return False
 
         return self.getDeph()
 
+    def getResult(self):
+        if self.border[self.destiny]['parents'] == []:
+            print('You dont search or dont have any result')
+        else:    
+            for node in self.border[self.destiny]['parents']:
+                print(node)
+            print(self.destiny)
 
     def search(self):
         print('Searching...')
-        self.incrementBorder(self.origin)
+        self.border[self.origin] = { 'dist': 0,  'parents': []}
+        
         if self.getDeph() | self.found:
-            print('encontrei o caminho')
+            self.getResult()
+            print('\nEncontrei o caminho hehe')
         else:
             print('caminho nao encontrado')
 
 if __name__ == "__main__":
-    graph = Graph('Arad', 'Bucharest')
+    graph = Graph('Neamt', 'Bucharest')
     graph.start()
     graph.search()
