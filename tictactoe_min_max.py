@@ -10,7 +10,6 @@ class Game:
         self.state = [[]]
         self.mode = mode
         self.player = True #true for p1 and false for p3
-        self.choices = []
 
     def start(self):
         self.state = [[-1 for i in range(0, 3)] for c in range(0, 3)]
@@ -19,7 +18,6 @@ class Game:
     def show(self):
         for l in self.state:
             print(l)
-        
         print('')
 
     def pass_turn(self):
@@ -42,9 +40,6 @@ class Game:
         
     def minmax_decision(self):
         self.generate_states(self.state, self.player, 0)
-        choice = random.randint(0, len(self.choices))
-        self.state = self.choices[choice]
-        self.choices = []
         self.player = not self.player
         self.show()
         self.pass_turn()
@@ -74,23 +69,20 @@ class Game:
         return False, -1
 
     def generate_states(self, state, player, height):
-        value = False
-        for l in range(len(state)):
-            for c in range(len(state)):
-                if state[l][c] == -1:
-                    temp_state = state
-                    temp_state[l][c] = player & 1 | 0
-                    value = self.generate_states(temp_state, not player, height+1)
-                    print(value)
 
-                    # alterar
-                    if player & (value==10) & height==0:
-                        self.choices.append(state)
-                    elif (not player) & (value==-10) & height==0:
-                        self.choices.append(state) 
-                    elif value==0 & height==0:
-                        self.choices.append(state)
-                    return value
+        temp_choices = []
+        if(not self.is_over(state)):
+            for choice in self.choices(state, player):
+                value = self.generate_states(choice, not player, height+1)
+                print(value)
+                if (value == 10) & player:
+                    temp_choices.append(choice)
+                elif (value == -10) & (not player):
+                    temp_choices.append(choice)
+                elif (value == 0):
+                    temp_choices.append(choice)
+            
+            #loop through temp choices
 
         result = self.winner(state)
         if result[0] & result[1]==0:
@@ -100,7 +92,22 @@ class Game:
         else:
             return 0
 
-        
+    def is_over(self, state):
+        for l in range(len(state)):
+            for c in range(len(state)):
+                if state[l][c] == -1:
+                    return False
+        return True
+
+    def choices(self, state, player):
+        choices = []
+        for l in range(len(state)):
+            for c in range(len(state)):
+                if state[l][c] == -1:
+                    temp_state = state
+                    temp_state[l][c] = player & 1 | 0
+                    choices.append(temp_state)
+        return choices
 
 if __name__ == "__main__":
 
