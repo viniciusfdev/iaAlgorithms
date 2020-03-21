@@ -4,6 +4,10 @@
 #https://www.geeksforgeeks.org/python-gui-tkinter/
 #http://www.codekraft.co/freecodecamp/jogo-da-velha-entendendo-o-algoritimo-minimax/
 import random
+import copy
+import sys
+
+sys.setrecursionlimit(3000)
 
 class Game:
     def __init__(self, mode):
@@ -22,7 +26,7 @@ class Game:
 
     def pass_turn(self):
         result = self.winner(self.state)
-        if result[0]:
+        if result[0] | self.is_over(self.state):
             print('*************************')
             print('The Game is over')
             print('The Winner is Player {}'.format(result[1]))
@@ -36,14 +40,10 @@ class Game:
             self.state[l-1][c-1] = 1
         
         self.show()
-        self.minmax_decision()
-        
-    def minmax_decision(self):
         self.generate_states(self.state, self.player, 0)
         self.player = not self.player
-        self.show()
         self.pass_turn()
-
+    
     def winner(self, state):
         # result linha
         for l in state:
@@ -69,25 +69,34 @@ class Game:
         return False, -1
 
     def generate_states(self, state, player, height):
-
-        temp_choices = []
-        if(not self.is_over(state)):
+        draw_choices = []
+        win_choices = []
+        if(not (self.is_over(state))):
             for choice in self.choices(state, player):
                 value = self.generate_states(choice, not player, height+1)
-                print(value)
-                if (value == 10) & player:
-                    temp_choices.append(choice)
-                elif (value == -10) & (not player):
-                    temp_choices.append(choice)
+                if (((value == 10) & player) | ((value == -10) & (not player))):
+                    win_choices.append({'value': value, 'state': choice})
                 elif (value == 0):
-                    temp_choices.append(choice)
-            
-            #loop through temp choices
+                    draw_choices.append({'value': value, 'state': choice})
+                
+            if len(win_choices) > 0:
+                rand_choice = random.randint(0, (len(win_choices))-1)
+                temp_choice = win_choices[rand_choice]
+                if height == 0: self.state = copy.deepcopy(temp_choice['state'])
+                return temp_choice['value']
+            elif len(draw_choices) > 0:
+                rand_choice = random.randint(0, (len(draw_choices))-1)
+                temp_choice = draw_choices[rand_choice]
+                if height == 0: self.state = copy.deepcopy(temp_choice['state'])
+                return temp_choice['value']
+            else:
+                return ((player & -10) | 10)
+        
 
         result = self.winner(state)
-        if result[0] & result[1]==0:
+        if(result[0] & (result[1]==0)):
             return -10
-        elif result[0] & result[1]==1:
+        elif(result[0] & (result[1]==1)):
             return 10
         else:
             return 0
@@ -104,9 +113,10 @@ class Game:
         for l in range(len(state)):
             for c in range(len(state)):
                 if state[l][c] == -1:
-                    temp_state = state
-                    temp_state[l][c] = player & 1 | 0
-                    choices.append(temp_state)
+                    temp_state = copy.deepcopy(state)
+                    temp_state[l][c] = (player & 1) | 0
+                    choices.append(copy.deepcopy(temp_state))
+                    del temp_state
         return choices
 
 if __name__ == "__main__":
