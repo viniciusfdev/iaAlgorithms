@@ -72,6 +72,11 @@ class Game:
         draw_choices = []
         win_choices = []
         if(not (self.is_over(state))):
+            result = self.winner(state)
+            if(result[0] & (result[1]==0)):
+                return -10
+            elif(result[0] & (result[1]==1)):
+                return 10
             for choice in self.choices(state, player):
                 value = self.generate_states(choice, not player, height+1)
                 if (((value == 10) & player) | ((value == -10) & (not player))):
