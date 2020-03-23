@@ -29,15 +29,18 @@ class Game:
         if result[0] | self.is_over(self.state):
             print('*************************')
             print('The Game is over')
-            print('The Winner is Player {}'.format(result[1]))
+            if result[1] != -1: 
+                print('The Winner is Player {}'.format(result[1]))
+            else:
+                print('O jogo empatou')
             self.show()
             print('*************************')
             return 
 
-        if (mode == 1) & self.player:
+        if (mode == 1) & (not (self.player)):
             l = input('\n*Insira a linha 1 a 3: ')
             c = input('\n*Insira a coluna 1 a 3: ')
-            self.state[l-1][c-1] = 1
+            self.state[l-1][c-1] = 0
         
         self.show()
         self.generate_states(self.state, self.player, 0)
