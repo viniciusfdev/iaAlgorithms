@@ -82,16 +82,18 @@ class Graph:
             print(self.destiny)
 
     def search(self):
-        print('Searching...')
         self.border[self.origin] = { 'dist': 0,  'parents': []}
         
         if self.getDeph() | self.found:
             self.getResult()
-            print('\nEncontrei o caminho hehe')
+            print('\n^ Caminho ^')
         else:
             print('caminho nao encontrado')
 
 if __name__ == "__main__":
-    graph = Graph('Neamt', 'Bucharest')
+    print("Insira a origem (ex: Craiova)")
+    origin = input()
+    graph = Graph(origin, "Bucharest")
     graph.start()
+    print("Indo a bucharest....")
     graph.search()
