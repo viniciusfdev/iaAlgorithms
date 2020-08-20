@@ -1,6 +1,5 @@
 class Graph:
     def __init__(self, origin, destiny):
-        self.nodePath = []
         self.nodes = {}
         self.origin = origin
         self.destiny = destiny
@@ -65,7 +64,6 @@ class Graph:
     def getDeph(self):  
         if self.whoIsMinor() == self.destiny:
             self.found = True
-            self.nodePath = self.border[self.destiny]
             return True
 
         elif self.incrementBorder(self.whoIsMinor()):
@@ -95,5 +93,5 @@ if __name__ == "__main__":
     origin = input()
     graph = Graph(origin, "Bucharest")
     graph.start()
-    print("Indo a bucharest....")
+    print("Indo a bucharest...\n")
     graph.search()
