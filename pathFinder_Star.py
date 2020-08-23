@@ -16,7 +16,7 @@ class Graph:
             'Sibiu': {'h': 253, 'conn': {'Oradea': 151, 'Arad': 140, 'Fagaras': 99, 'Rimnicu Vikea': 80}},
             'Timisoara': {'h': 329, 'conn': {'Arad': 118, 'Lugoj': 111}},
             'Lugoj': {'h': 244, 'conn': {'Timisoara': 111, 'Mehadia': 70}},
-            'Mehadia': {'h': 241, 'conn': {'Logoj': 70, 'Dobreta': 75}},
+            'Mehadia': {'h': 241, 'conn': {'Lugoj': 70, 'Dobreta': 75}},
             'Dobreta': {'h': 242, 'conn': {'Mehadia': 75, 'Craiova': 120}},
             'Fagaras': {'h': 176, 'conn': {'Sibiu': 99, 'Bucharest': 211}},
             'Rimnicu Vikea': {'h': 193, 'conn': {'Sibiu': 80, 'Pitesti': 97, 'Craiova': 148}},
@@ -44,16 +44,17 @@ class Graph:
     def incrementBorder(self, node_key):
 
         parents = self.border[node_key]['parents']
-        parents.append(node_key)
-
-        parenthDist = self.border[node_key]['dist']
+        parentDist = self.border[node_key]['dist']
+        parent = {}
+        parent[node_key] = parentDist    
+        parents.append(parent)
         
         del self.border[node_key]
         self.visited.append(node_key)
         
         for node in self.nodes[node_key]['conn']:
             if(node not in self.visited):
-                self.border[node] = { 'dist': self.nodes[node_key]['conn'][node]+parenthDist,  'parents': parents }
+                self.border[node] = { 'dist': self.nodes[node_key]['conn'][node]+parentDist,  'parents': parents }
 
         if self.border == {}:
             return True
@@ -77,7 +78,9 @@ class Graph:
         else:    
             for node in self.border[self.destiny]['parents']:
                 print(node)
-            print(self.destiny)
+            destiny = {}
+            destiny[self.destiny] = self.border[self.destiny]['dist']
+            print(destiny)
 
     def search(self):
         self.border[self.origin] = { 'dist': 0,  'parents': []}
